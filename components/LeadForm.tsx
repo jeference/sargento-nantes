@@ -21,10 +21,10 @@ function SubmitButton() {
     >
       {pending ? (
         <>
-          <Loader2 className="h-4 w-4 animate-spin" /> Enviando…
+          <Loader2 className="h-4 w-4 animate-spin" /> Liberando acesso…
         </>
       ) : (
-        <>Quero entrar na tropa</>
+        <>Liberar meu acesso</>
       )}
     </button>
   );
@@ -70,12 +70,11 @@ export function LeadForm() {
         <div className="flex items-center gap-3 text-gold-400">
           <CheckCircle2 className="h-6 w-6" strokeWidth={2.5} />
           <p className="font-display text-lg uppercase tracking-[0.18em]">
-            Cadastro confirmado, soldado
+            Acesso liberado
           </p>
         </div>
         <p className="max-w-md text-sm text-bone/70">
-          Sua posição está garantida. Acesse agora o grupo VIP no WhatsApp e entre em formação
-          com o Sargento.
+          Agora você pode entrar no grupo VIP do Sargento Nantes.
         </p>
         <VipButton href={state.vipUrl} />
       </div>
@@ -105,7 +104,7 @@ export function LeadForm() {
           id="name"
           type="text"
           autoComplete="name"
-          placeholder="Como o Sargento deve te chamar?"
+          placeholder="Como podemos te chamar?"
           aria-invalid={!!nameError}
           {...register("name")}
           className="input-dark w-full rounded-lg px-4 py-3.5 text-base"
@@ -150,7 +149,7 @@ export function LeadForm() {
 
       <p className="text-center text-[11px] leading-relaxed text-muted">
         Ao enviar, você concorda em receber comunicações do Sargento Nantes.
-        Sem spam, apenas conteúdo de valor.
+        Seus dados ficam seguros — sem spam, só o que importa de verdade.
       </p>
     </form>
   );

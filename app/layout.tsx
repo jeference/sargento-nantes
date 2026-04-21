@@ -16,13 +16,13 @@ const display = Anton({
 });
 
 export const metadata: Metadata = {
-  title: "Sargento Nantes — Grupo VIP de Alta Performance",
+  title: "Sargento Nantes — O Que a Mídia Não Te Mostra",
   description:
-    "Entre para o grupo VIP do Sargento Nantes e receba em primeira mão as missões, estratégias e mentoria de alta performance.",
+    "Entre no Grupo VIP do Sargento Nantes e receba bandido se dando mal, bastidores de operações e dicas de segurança para blindar sua família. Conteúdo que a grande imprensa esconde.",
   openGraph: {
-    title: "Sargento Nantes — Grupo VIP",
+    title: "Sargento Nantes — O Que a Mídia Não Te Mostra",
     description:
-      "Mentoria de disciplina, liderança e execução. Assuma posição e entre para a tropa.",
+      "Bastidores de operações, bandido se dando mal e segurança prática para sua família. Direto no seu WhatsApp.",
     type: "website",
   },
 };
