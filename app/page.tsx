@@ -3,16 +3,14 @@ import { LeadForm } from "@/components/LeadForm";
 
 export default function HomePage() {
   return (
-    <main className="relative z-10 mx-auto flex min-h-screen max-w-3xl flex-col items-center justify-center gap-16 px-6 py-20 sm:py-28">
+    <main className="relative z-10 mx-auto flex min-h-screen max-w-xl flex-col gap-4 px-5 pb-4 pt-3 sm:gap-6 sm:px-6 sm:pb-6 sm:pt-5">
       <Hero />
 
-      <div className="w-full max-w-xl">
-        <LeadForm />
-      </div>
+      <LeadForm />
 
-      <footer className="mt-auto flex flex-col items-center gap-3 pt-16 text-center">
-        <div className="hairline w-40" />
-        <p className="text-[11px] uppercase tracking-[0.32em] text-muted">
+      <footer className="flex flex-col items-center gap-1.5 pt-1 text-center">
+        <div className="hairline w-20" />
+        <p className="text-[10px] uppercase tracking-[0.32em] text-muted">
           © {new Date().getFullYear()} · Sargento Nantes
         </p>
       </footer>

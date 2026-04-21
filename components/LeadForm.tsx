@@ -89,68 +89,53 @@ export function LeadForm() {
       ref={formRef}
       onSubmit={onSubmit}
       noValidate
-      className="relative flex w-full flex-col gap-5 rounded-2xl border border-ink-500/40 bg-ink-800/50 p-6 shadow-[0_30px_80px_-40px_rgba(0,0,0,0.9)] backdrop-blur-sm sm:p-8"
+      className="relative flex w-full flex-col gap-4 rounded-2xl border border-ink-500/40 bg-ink-800/50 p-5 shadow-[0_30px_80px_-40px_rgba(0,0,0,0.9)] backdrop-blur-sm sm:gap-5 sm:p-7"
     >
       <div className="absolute inset-x-8 -top-px h-px bg-gradient-to-r from-transparent via-gold-600/70 to-transparent" />
 
       <div>
-        <label
-          htmlFor="name"
-          className="mb-2 block text-[11px] font-medium uppercase tracking-[0.22em] text-bone/70"
-        >
-          Seu nome
-        </label>
         <input
           id="name"
           type="text"
           autoComplete="name"
-          placeholder="Como podemos te chamar?"
+          placeholder="Seu nome"
           aria-invalid={!!nameError}
+          aria-label="Seu nome"
           {...register("name")}
           className="input-dark w-full rounded-lg px-4 py-3.5 text-base"
         />
         {nameError && (
-          <p className="mt-2 flex items-center gap-1.5 text-xs text-danger">
+          <p className="mt-1.5 flex items-center gap-1.5 text-xs text-danger">
             <ShieldAlert className="h-3.5 w-3.5" /> {nameError}
           </p>
         )}
       </div>
 
       <div>
-        <label
-          htmlFor="email"
-          className="mb-2 block text-[11px] font-medium uppercase tracking-[0.22em] text-bone/70"
-        >
-          Seu melhor e-mail
-        </label>
         <input
           id="email"
           type="email"
           autoComplete="email"
-          placeholder="voce@exemplo.com"
+          placeholder="Seu melhor e-mail"
           aria-invalid={!!emailError}
+          aria-label="Seu melhor e-mail"
           {...register("email")}
           className="input-dark w-full rounded-lg px-4 py-3.5 text-base"
         />
         {emailError && (
-          <p className="mt-2 flex items-center gap-1.5 text-xs text-danger">
+          <p className="mt-1.5 flex items-center gap-1.5 text-xs text-danger">
             <ShieldAlert className="h-3.5 w-3.5" /> {emailError}
           </p>
         )}
       </div>
 
       {state.error && !state.fieldErrors && (
-        <p className="flex items-center gap-2 rounded-md border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger">
+        <p className="flex items-center gap-2 rounded-md border border-danger/30 bg-danger/10 px-3 py-2 text-xs text-danger">
           <ShieldAlert className="h-4 w-4" /> {state.error}
         </p>
       )}
 
       <SubmitButton />
-
-      <p className="text-center text-[11px] leading-relaxed text-muted">
-        Ao enviar, você concorda em receber comunicações do Sargento Nantes.
-        Seus dados ficam seguros — sem spam, só o que importa de verdade.
-      </p>
     </form>
   );
 }
