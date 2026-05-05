@@ -1,0 +1,6 @@
+# Supabase — pegar em https://supabase.com/dashboard/project/_/settings/api
+NEXT_PUBLIC_SUPABASE_URL=https://pwkqchmgldeqzkuphuvr.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB3a3FjaG1nbGRlcXprdXBodXZyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Njc1MDc5NywiZXhwIjoyMDkyMzI2Nzk3fQ.FbzNlKkKXcpRN6hFijqxtgxk5yJfP5yrxgeDikokcgw
+
+# Link de convite do grupo VIP no WhatsApp
+NEXT_PUBLIC_WHATSAPP_VIP_URL=https://chat.whatsapp.com/Gd89FsmtTosDZQ5F4esmoe?mode=gi_t

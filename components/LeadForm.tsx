@@ -2,12 +2,12 @@
 
 import { startTransition, useActionState, useEffect, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CheckCircle2, Loader2, ShieldAlert } from "lucide-react";
 import { submitLead, type SubmitLeadState } from "@/app/actions";
 import { leadSchema, type LeadInput } from "@/lib/schema";
-import { VipButton } from "./VipButton";
+import { PhoneNumberInputField } from "./PhoneNumberInput";
 
 const initial: SubmitLeadState = { ok: false };
 
@@ -32,39 +32,31 @@ function SubmitButton() {
 
 export function LeadForm() {
   const [state, formAction] = useActionState(submitLead, initial);
-  const [clientErrors, setClientErrors] = useState<{ name?: string; email?: string }>({});
   const formRef = useRef<HTMLFormElement>(null);
 
-  const { register, trigger, getValues } = useForm<LeadInput>({
+  const {
+    register,
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LeadInput>({
     resolver: zodResolver(leadSchema),
     mode: "onBlur",
-    defaultValues: { name: "", email: "" },
+    defaultValues: { name: "", phone: "" },
   });
 
   useEffect(() => {
     if (state.ok) formRef.current?.reset();
   }, [state.ok]);
 
-  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const form = e.currentTarget;
-    const valid = await trigger();
-    if (!valid) {
-      const { name, email } = getValues();
-      setClientErrors({
-        name: name.trim().length < 2 ? "Informe seu nome completo" : undefined,
-        email: !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-          ? "Informe um e-mail válido"
-          : undefined,
-      });
-      return;
-    }
-    setClientErrors({});
-    const fd = new FormData(form);
+  async function onSubmit(data: LeadInput) {
+    const fd = new FormData();
+    fd.append("name", data.name);
+    fd.append("phone", data.phone);
     startTransition(() => formAction(fd));
   }
 
-  if (state.ok && state.vipUrl) {
+  if (state.ok) {
     return (
       <div className="animate-fade-up flex flex-col items-center gap-6 rounded-2xl border border-gold-600/30 bg-ink-800/50 p-8 text-center shadow-gold-glow backdrop-blur">
         <div className="flex items-center gap-3 text-gold-400">
@@ -74,20 +66,16 @@ export function LeadForm() {
           </p>
         </div>
         <p className="max-w-md text-sm text-bone/70">
-          Agora você pode entrar no grupo VIP do Sargento Nantes.
+          Perfeito! Seus dados foram registrados. A equipe do Sargento Nantes entrará em contato via WhatsApp em breve.
         </p>
-        <VipButton href={state.vipUrl} />
       </div>
     );
   }
 
-  const nameError = clientErrors.name ?? state.fieldErrors?.name;
-  const emailError = clientErrors.email ?? state.fieldErrors?.email;
-
   return (
     <form
       ref={formRef}
-      onSubmit={onSubmit}
+      onSubmit={handleSubmit(onSubmit)}
       noValidate
       className="relative flex w-full flex-col gap-4 rounded-2xl border border-ink-500/40 bg-ink-800/50 p-5 shadow-[0_30px_80px_-40px_rgba(0,0,0,0.9)] backdrop-blur-sm sm:gap-5 sm:p-7"
     >
@@ -99,34 +87,32 @@ export function LeadForm() {
           type="text"
           autoComplete="name"
           placeholder="Seu nome"
-          aria-invalid={!!nameError}
+          aria-invalid={!!errors.name}
           aria-label="Seu nome"
           {...register("name")}
           className="input-dark w-full rounded-lg px-4 py-3.5 text-base"
         />
-        {nameError && (
+        {errors.name && (
           <p className="mt-1.5 flex items-center gap-1.5 text-xs text-danger">
-            <ShieldAlert className="h-3.5 w-3.5" /> {nameError}
+            <ShieldAlert className="h-3.5 w-3.5" /> {errors.name.message}
           </p>
         )}
       </div>
 
       <div>
-        <input
-          id="email"
-          type="email"
-          autoComplete="email"
-          placeholder="Seu melhor e-mail"
-          aria-invalid={!!emailError}
-          aria-label="Seu melhor e-mail"
-          {...register("email")}
-          className="input-dark w-full rounded-lg px-4 py-3.5 text-base"
+        <Controller
+          name="phone"
+          control={control}
+          render={({ field }) => (
+            <PhoneNumberInputField
+              value={field.value}
+              onChange={field.onChange}
+              onBlur={field.onBlur}
+              error={errors.phone?.message}
+              disabled={false}
+            />
+          )}
         />
-        {emailError && (
-          <p className="mt-1.5 flex items-center gap-1.5 text-xs text-danger">
-            <ShieldAlert className="h-3.5 w-3.5" /> {emailError}
-          </p>
-        )}
       </div>
 
       {state.error && !state.fieldErrors && (

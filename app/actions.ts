@@ -6,8 +6,7 @@ import { getSupabaseAdmin } from "@/lib/supabase";
 export type SubmitLeadState = {
   ok: boolean;
   error?: string;
-  vipUrl?: string;
-  fieldErrors?: { name?: string; email?: string };
+  fieldErrors?: { name?: string; phone?: string };
 };
 
 export async function submitLead(
@@ -16,13 +15,13 @@ export async function submitLead(
 ): Promise<SubmitLeadState> {
   const parsed = leadSchema.safeParse({
     name: formData.get("name"),
-    email: formData.get("email"),
+    phone: formData.get("phone"),
   });
 
   if (!parsed.success) {
-    const fieldErrors: { name?: string; email?: string } = {};
+    const fieldErrors: { name?: string; phone?: string } = {};
     for (const issue of parsed.error.issues) {
-      const key = issue.path[0] as "name" | "email";
+      const key = issue.path[0] as "name" | "phone";
       if (!fieldErrors[key]) fieldErrors[key] = issue.message;
     }
     return { ok: false, error: "Corrija os campos destacados.", fieldErrors };
@@ -40,8 +39,5 @@ export async function submitLead(
 
   return {
     ok: true,
-    vipUrl:
-      process.env.NEXT_PUBLIC_WHATSAPP_VIP_URL ??
-      "https://chat.whatsapp.com/",
   };
 }

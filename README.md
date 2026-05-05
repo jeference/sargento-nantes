@@ -15,12 +15,24 @@ No SQL Editor do seu projeto Supabase, rode:
 create table public.leads (
   id uuid primary key default gen_random_uuid(),
   name text not null,
-  email text not null,
+  phone text not null,
   created_at timestamptz not null default now()
 );
 
 -- Inserts serão feitos via service role no servidor.
 alter table public.leads enable row level security;
+```
+
+Se você já tem a tabela antiga com coluna `email`, delete-a primeiro ou altere-a:
+
+```sql
+-- Opção 1: deletar a tabela antiga
+drop table if exists public.leads cascade;
+
+-- Depois rodar a criação acima
+
+-- Opção 2: alterar a coluna existente
+alter table public.leads rename column email to phone;
 ```
 
 ### 2. Variáveis de ambiente

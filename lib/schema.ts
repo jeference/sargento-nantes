@@ -6,11 +6,11 @@ export const leadSchema = z.object({
     .trim()
     .min(2, "Informe seu nome completo")
     .max(120, "Nome muito longo"),
-  email: z
+  phone: z
     .string()
     .trim()
-    .toLowerCase()
-    .email("Informe um e-mail válido"),
+    .min(10, "Telefone inválido")
+    .max(20, "Telefone muito longo"),
 });
 
 export type LeadInput = z.infer<typeof leadSchema>;
