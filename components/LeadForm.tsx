@@ -4,7 +4,7 @@ import { startTransition, useActionState, useEffect, useRef, useState } from "re
 import { useFormStatus } from "react-dom";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CheckCircle2, Loader2, ShieldAlert } from "lucide-react";
+import { CheckCircle2, Loader2, PenLine, ShieldAlert } from "lucide-react";
 import { submitLead, type SubmitLeadState } from "@/app/actions";
 import { leadSchema, type LeadInput } from "@/lib/schema";
 import { PhoneNumberInputField } from "./PhoneNumberInput";
@@ -21,10 +21,13 @@ function SubmitButton() {
     >
       {pending ? (
         <>
-          <Loader2 className="h-4 w-4 animate-spin" /> Liberando acesso…
+          <Loader2 className="h-4 w-4 animate-spin" /> Registrando assinatura…
         </>
       ) : (
-        <>Liberar meu acesso</>
+        <>
+          <PenLine className="h-4 w-4" strokeWidth={2.5} />
+          Assinar agora
+        </>
       )}
     </button>
   );
@@ -62,23 +65,36 @@ export function LeadForm() {
         <div className="flex items-center gap-3 text-gold-400">
           <CheckCircle2 className="h-6 w-6" strokeWidth={2.5} />
           <p className="font-display text-lg uppercase tracking-[0.18em]">
-            Acesso liberado
+            Assinatura registrada
           </p>
         </div>
         <p className="max-w-md text-sm text-bone/70">
-          Perfeito! Seus dados foram registrados. A equipe do Sargento Nantes entrará em contato via WhatsApp em breve.
+          Sua assinatura foi computada. Quanto mais gente assinar, mais cedo o
+          Sargento abre a mentoria. <strong className="text-bone">Compartilhe com quem você quer proteger.</strong>
         </p>
       </div>
     );
   }
 
   return (
-    <form
-      ref={formRef}
-      onSubmit={handleSubmit(onSubmit)}
-      noValidate
-      className="relative flex w-full flex-col gap-4 rounded-2xl border border-ink-500/40 bg-ink-800/50 p-5 shadow-[0_30px_80px_-40px_rgba(0,0,0,0.9)] backdrop-blur-sm sm:gap-5 sm:p-7"
-    >
+    <div className="flex w-full flex-col gap-4">
+      <div className="relative w-full rounded-xl border-l-2 border-gold-500 bg-ink-800/40 px-4 py-3 text-left text-sm leading-snug text-bone/85 sm:px-5 sm:text-base">
+        <p>
+          <strong className="text-bone">
+            Você quer que o Sargento Nantes te ensine a proteger sua família?
+          </strong>{" "}
+          Assine o abaixo-assinado e exija que o Nantes — referência em segurança
+          pública — abra a mentoria que pode salvar quem você ama.{" "}
+          <span className="text-gold-400">Quanto mais assinaturas, mais cedo ele libera.</span>
+        </p>
+      </div>
+
+      <form
+        ref={formRef}
+        onSubmit={handleSubmit(onSubmit)}
+        noValidate
+        className="relative flex w-full flex-col gap-4 rounded-2xl border border-ink-500/40 bg-ink-800/50 p-5 shadow-[0_30px_80px_-40px_rgba(0,0,0,0.9)] backdrop-blur-sm sm:gap-5 sm:p-7"
+      >
       <div className="absolute inset-x-8 -top-px h-px bg-gradient-to-r from-transparent via-gold-600/70 to-transparent" />
 
       <div>
@@ -122,6 +138,18 @@ export function LeadForm() {
       )}
 
       <SubmitButton />
-    </form>
+      </form>
+
+      <div className="flex items-center justify-center gap-2 text-center text-[11px] leading-snug text-bone/70 sm:text-xs">
+        <span className="relative flex h-2 w-2 shrink-0">
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500/70" />
+          <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+        </span>
+        <span>
+          <strong className="text-bone">+1.247 brasileiros</strong> assinaram nas últimas 24h ·
+          <span className="text-gold-400"> não fique de fora</span>
+        </span>
+      </div>
+    </div>
   );
 }

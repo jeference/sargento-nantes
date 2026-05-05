@@ -1,6 +1,6 @@
-# Sargento Nantes — Landing VIP
+# Sargento Nantes — Abaixo-Assinado pela Mentoria
 
-Landing page de captura de leads (nome + e-mail) para o grupo VIP do **Sargento Nantes**.
+Landing page de abaixo-assinado: visitantes assinam exigindo que o **Sargento Nantes** abra uma mentoria de proteção familiar contra a criminalidade. Captura **nome + WhatsApp** e persiste no Supabase.
 Stack: **Next.js 15 (App Router) + Supabase + Tailwind CSS**.
 
 ---
@@ -19,20 +19,15 @@ create table public.leads (
   created_at timestamptz not null default now()
 );
 
--- Inserts serão feitos via service role no servidor.
+-- Inserts são feitos via service role no servidor.
 alter table public.leads enable row level security;
 ```
 
-Se você já tem a tabela antiga com coluna `email`, delete-a primeiro ou altere-a:
+Se você já tem a tabela antiga, recrie:
 
 ```sql
--- Opção 1: deletar a tabela antiga
 drop table if exists public.leads cascade;
-
--- Depois rodar a criação acima
-
--- Opção 2: alterar a coluna existente
-alter table public.leads rename column email to phone;
+-- depois rode o create acima
 ```
 
 ### 2. Variáveis de ambiente
@@ -42,7 +37,6 @@ Copie [.env.example](.env.example) para `.env.local` e preencha:
 ```
 NEXT_PUBLIC_SUPABASE_URL=https://SEU-PROJETO.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=eyJ...
-NEXT_PUBLIC_WHATSAPP_VIP_URL=https://chat.whatsapp.com/SEU-CONVITE
 ```
 
 > A `SUPABASE_SERVICE_ROLE_KEY` é sensível — só é usada em Server Actions, nunca exposta ao cliente.
@@ -60,13 +54,14 @@ Acesse `http://localhost:3000`.
 
 ## Como funciona
 
-- [app/page.tsx](app/page.tsx) compõe o Hero + Formulário.
-- [components/LeadForm.tsx](components/LeadForm.tsx) valida com Zod + React Hook Form e chama a Server Action.
-- [app/actions.ts](app/actions.ts) valida no servidor, salva no Supabase e retorna o link do grupo VIP.
-- Com sucesso, o formulário é substituído por [components/VipButton.tsx](components/VipButton.tsx) que leva ao WhatsApp.
+- [app/page.tsx](app/page.tsx) compõe Hero + Formulário.
+- [components/Hero.tsx](components/Hero.tsx) — imagem + headline de pânico/urgência.
+- [components/LeadForm.tsx](components/LeadForm.tsx) — pitch do abaixo-assinado, form com Zod + React Hook Form, sucesso confirma a assinatura.
+- [components/PhoneNumberInput.tsx](components/PhoneNumberInput.tsx) — input internacional de telefone.
+- [app/actions.ts](app/actions.ts) — Server Action: valida e grava na tabela `leads`.
 
 ## Verificação
 
-1. Preencher um e-mail inválido → validação no cliente bloqueia o envio.
-2. Preencher dados válidos → aparece o botão do grupo VIP.
+1. Preencher telefone inválido → validação bloqueia o envio.
+2. Preencher dados válidos → tela de "Assinatura registrada".
 3. Conferir no Supabase → Table Editor → `leads` que a linha foi criada.

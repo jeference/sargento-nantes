@@ -34,22 +34,23 @@ export function Hero() {
 
           <div className="absolute inset-x-0 top-4 flex items-center justify-center gap-2.5 text-[9px] tracking-[0.38em] text-gold-500 sm:top-5 sm:text-[10px]">
             <span className="h-px w-6 bg-gold-600/70" />
-            <span className="font-medium">SARGENTO NANTES · CANAL VIP</span>
+            <span className="font-medium">ABAIXO-ASSINADO · MENTORIA NANTES</span>
             <span className="h-px w-6 bg-gold-600/70" />
           </div>
 
           <div className="absolute inset-x-0 bottom-0 flex flex-col items-center px-5 pb-6 pt-20 sm:px-8 sm:pb-8">
             <h1 className="font-display text-[32px] leading-[0.92] tracking-tight sm:text-5xl md:text-6xl">
-              <span className="block text-bone">VOCÊ VAI VER O QUE</span>
-              <span className="block text-gold-gradient">A MÍDIA ESCONDE</span>
-              <span className="block text-bone">DE VOCÊ</span>
+              <span className="block text-bone">ENQUANTO VOCÊ ESPERA</span>
+              <span className="block text-gold-gradient">BANDIDO INVADE</span>
+              <span className="block text-bone">SUA CASA</span>
             </h1>
           </div>
         </div>
       </div>
 
-      <p className="mt-4 max-w-sm text-balance text-sm leading-snug text-bone/70 sm:mt-5 sm:text-base">
-        Bandido se dando mal, bastidores de operações e dicas de segurança para você proteger sua família.
+      <p className="mt-4 max-w-md text-balance text-sm leading-snug text-bone/75 sm:mt-5 sm:text-base">
+        A cada <strong className="text-bone">9 minutos</strong> uma família é destruída pela violência no Brasil.
+        Você acha mesmo que está preparado pra proteger a sua?
       </p>
     </section>
   );

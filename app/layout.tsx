@@ -16,13 +16,13 @@ const display = Anton({
 });
 
 export const metadata: Metadata = {
-  title: "Sargento Nantes — O Que a Mídia Não Te Mostra",
+  title: "Sargento Nantes — Abaixo-Assinado pela Mentoria de Segurança Familiar",
   description:
-    "Entre no Grupo VIP do Sargento Nantes e receba bandido se dando mal, bastidores de operações e dicas de segurança para blindar sua família. Conteúdo que a grande imprensa esconde.",
+    "A cada 9 minutos uma família é destruída pela violência. Assine o abaixo-assinado e exija que o Sargento Nantes — referência em segurança pública — abra a mentoria que pode salvar a sua.",
   openGraph: {
-    title: "Sargento Nantes — O Que a Mídia Não Te Mostra",
+    title: "Sargento Nantes — Abaixo-Assinado pela Mentoria de Segurança",
     description:
-      "Bastidores de operações, bandido se dando mal e segurança prática para sua família. Direto no seu WhatsApp.",
+      "Assine e exija que o Sargento Nantes abra a mentoria de proteção familiar contra a criminalidade.",
     type: "website",
   },
 };
