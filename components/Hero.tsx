@@ -3,7 +3,7 @@ import Image from "next/image";
 export function Hero() {
   return (
     <section className="relative z-10 flex w-full flex-col items-center text-center">
-      <div className="relative h-[50vh] max-h-[540px] min-h-[280px] w-full">
+      <div className="relative h-[42vh] max-h-[460px] min-h-[240px] w-full">
         <div
           aria-hidden
           className="absolute -inset-6 rounded-[40px] bg-[radial-gradient(ellipse_at_center,rgba(212,175,55,0.25),transparent_65%)] blur-2xl"
@@ -16,7 +16,7 @@ export function Hero() {
             fill
             priority
             sizes="(max-width: 640px) 100vw, 640px"
-            className="object-cover object-[50%_20%]"
+            className="object-cover object-top"
           />
 
           <div

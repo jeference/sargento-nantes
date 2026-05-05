@@ -18,7 +18,7 @@ const display = Anton({
 export const metadata: Metadata = {
   title: "Sargento Nantes — Abaixo-Assinado pela Mentoria de Segurança Familiar",
   description:
-    "A cada 9 minutos uma família é destruída pela violência. Assine o abaixo-assinado e exija que o Sargento Nantes — referência em segurança pública — abra a mentoria que pode salvar a sua.",
+    "A cada 9 minutos uma família é destruída pela violência. Assine o abaixo-assinado e exija que o Sargento Nantes abra a mentoria que pode salvar a sua.",
   openGraph: {
     title: "Sargento Nantes — Abaixo-Assinado pela Mentoria de Segurança",
     description:

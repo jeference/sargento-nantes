@@ -83,8 +83,7 @@ export function LeadForm() {
           <strong className="text-bone">
             Você quer que o Sargento Nantes te ensine a proteger sua família?
           </strong>{" "}
-          Assine o abaixo-assinado e exija que o Nantes — referência em segurança
-          pública — abra a mentoria que pode salvar quem você ama.{" "}
+          Assine o abaixo-assinado e exija que o Nantes abra o treinamento que pode salvar quem você ama.{" "}
           <span className="text-gold-400">Quanto mais assinaturas, mais cedo ele libera.</span>
         </p>
       </div>
