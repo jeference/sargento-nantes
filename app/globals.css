@@ -110,7 +110,8 @@
   .input-dark::placeholder {
     color: #5a5a5a;
   }
-  .input-dark:focus {
+  .input-dark:focus,
+  .input-dark:focus-within {
     outline: none;
     border-color: rgba(212, 175, 55, 0.7);
     box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);

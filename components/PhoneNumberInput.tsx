@@ -1,8 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import PhoneInput from "react-phone-number-input";
-import { isPossiblePhoneNumber } from "react-phone-number-input";
 import { ShieldAlert } from "lucide-react";
 import "react-phone-number-input/style.css";
 
@@ -24,27 +22,18 @@ export function PhoneNumberInputField({
   return (
     <div>
       <PhoneInput
-        placeholder="Seu número de WhatsApp"
+        defaultCountry="BR"
+        placeholder="Seu WhatsApp"
         value={value || undefined}
         onChange={(val) => onChange(val || "")}
         onBlur={onBlur}
-        defaultCountry="BR"
-        international
-        countryCallingCodeEditable={false}
         disabled={disabled}
-        className={`input-dark w-full rounded-lg px-4 py-3.5 text-base`}
+        aria-invalid={!!error}
+        className="input-dark flex w-full items-center gap-2 rounded-lg px-4 py-3.5 text-base"
         numberInputProps={{
-          className: "input-dark w-full text-base",
-          id: "phone",
-        }}
-        style={{
-          outline: "none",
-          border: error ? "1px solid rgb(228, 87, 46)" : "1px solid rgb(42, 42, 42)",
-          borderRadius: "0.5rem",
-          padding: "0.875rem 1rem",
-          backgroundColor: "rgb(15, 15, 15)",
-          color: "rgb(237, 237, 237)",
-          fontSize: "1rem",
+          className:
+            "min-w-0 flex-1 border-0 bg-transparent text-base text-bone outline-none placeholder:text-[#5a5a5a]",
+          "aria-label": "Seu WhatsApp",
         }}
       />
       {error && (
