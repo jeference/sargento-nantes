@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ChevronDown, Loader2, ShieldAlert } from "lucide-react";
+import { Loader2, ShieldAlert } from "lucide-react";
 
 interface BrazilianState {
   id: number;
@@ -32,6 +32,7 @@ export function LocationSelect({
   cityError,
 }: LocationSelectProps) {
   const [states, setStates] = useState<BrazilianState[]>([]);
+  const [stateText, setStateText] = useState("");
   const [municipalities, setMunicipalities] = useState<Municipality[]>([]);
   const [loadingMunicipalities, setLoadingMunicipalities] = useState(false);
 
@@ -57,32 +58,45 @@ export function LocationSelect({
       .finally(() => setLoadingMunicipalities(false));
   }, [state]);
 
+  useEffect(() => {
+    if (!state) setStateText("");
+  }, [state]);
+
+  function handleStateInput(text: string) {
+    const dropdownPick = states.find((s) => `${s.sigla} - ${s.nome}` === text);
+    if (dropdownPick) {
+      setStateText(dropdownPick.nome);
+      onStateChange(dropdownPick.sigla);
+      return;
+    }
+
+    setStateText(text);
+    const trimmed = text.trim().toLowerCase();
+    const match = states.find(
+      (s) => s.sigla.toLowerCase() === trimmed || s.nome.toLowerCase() === trimmed
+    );
+    onStateChange(match ? match.sigla : "");
+  }
+
   return (
-    <div className="grid grid-cols-[88px_1fr] gap-2.5">
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
       <div>
-        <div className="relative">
-          <select
-            value={state}
-            onChange={(e) => {
-              onStateChange(e.target.value);
-              onCityChange("");
-            }}
-            aria-invalid={!!stateError}
-            aria-label="Estado"
-            className="input-dark w-full appearance-none rounded-lg px-3 py-3.5 pr-7 text-base"
-          >
-            <option value="">UF</option>
-            {states.map((s) => (
-              <option key={s.id} value={s.sigla}>
-                {s.sigla}
-              </option>
-            ))}
-          </select>
-          <ChevronDown
-            aria-hidden
-            className="pointer-events-none absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted"
-          />
-        </div>
+        <input
+          type="text"
+          list="state-options"
+          value={stateText}
+          onChange={(e) => handleStateInput(e.target.value)}
+          placeholder="Seu estado"
+          aria-invalid={!!stateError}
+          aria-label="Estado"
+          autoComplete="off"
+          className="input-dark w-full rounded-lg px-4 py-3.5 text-base"
+        />
+        <datalist id="state-options">
+          {states.map((s) => (
+            <option key={s.id} value={`${s.sigla} - ${s.nome}`} />
+          ))}
+        </datalist>
         {stateError && (
           <p className="mt-1.5 flex items-center gap-1.5 text-xs text-danger">
             <ShieldAlert className="h-3.5 w-3.5" /> {stateError}
@@ -100,7 +114,7 @@ export function LocationSelect({
             disabled={!state || loadingMunicipalities}
             placeholder={
               !state
-                ? "Selecione a UF primeiro"
+                ? "Selecione o estado primeiro"
                 : loadingMunicipalities
                 ? "Carregando cidades…"
                 : "Sua cidade"
