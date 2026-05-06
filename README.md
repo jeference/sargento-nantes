@@ -16,6 +16,8 @@ create table public.leads (
   id uuid primary key default gen_random_uuid(),
   name text not null,
   phone text not null,
+  state text not null,
+  city text not null,
   created_at timestamptz not null default now()
 );
 
@@ -23,11 +25,12 @@ create table public.leads (
 alter table public.leads enable row level security;
 ```
 
-Se você já tem a tabela antiga, recrie:
+Se você já tem a tabela antiga sem `state`/`city`, faça a migração:
 
 ```sql
-drop table if exists public.leads cascade;
--- depois rode o create acima
+alter table public.leads
+  add column if not exists state text not null default '',
+  add column if not exists city text not null default '';
 ```
 
 ### 2. Variáveis de ambiente
