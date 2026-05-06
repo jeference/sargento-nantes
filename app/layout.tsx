@@ -16,13 +16,13 @@ const display = Anton({
 });
 
 export const metadata: Metadata = {
-  title: "Sargento Nantes — Abaixo-Assinado pela Mentoria de Segurança Familiar",
+  title: "Sargento Nantes — Abaixo-Assinado por um Treinamento de Segurança Domiciliar",
   description:
-    "A cada 9 minutos uma família é destruída pela violência. Assine o abaixo-assinado e exija que o Sargento Nantes abra a mentoria que pode salvar a sua.",
+    "Em São Paulo, uma residência é invadida a cada 10 minutos (Fonte: SSP). Apoie o abaixo-assinado para que o Sargento Nantes realize um treinamento digital de segurança domiciliar.",
   openGraph: {
-    title: "Sargento Nantes — Abaixo-Assinado pela Mentoria de Segurança",
+    title: "Sargento Nantes — Abaixo-Assinado por um Treinamento de Segurança Domiciliar",
     description:
-      "Assine e exija que o Sargento Nantes abra a mentoria de proteção familiar contra a criminalidade.",
+      "Apoie o abaixo-assinado para que o Sargento Nantes realize um treinamento digital de segurança domiciliar para famílias brasileiras.",
     type: "website",
   },
 };

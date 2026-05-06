@@ -68,9 +68,10 @@ export function LeadForm() {
             Assinatura registrada
           </p>
         </div>
-        <p className="max-w-md text-sm text-bone/70">
-          Sua assinatura foi computada. Quanto mais gente assinar, mais cedo o
-          Sargento abre a mentoria. <strong className="text-bone">Compartilhe com quem você quer proteger.</strong>
+        <p className="max-w-md text-sm text-bone/75">
+          Sua assinatura foi computada. Você será informado sobre o andamento do
+          treinamento digital de segurança domiciliar do Sargento Nantes.{" "}
+          <strong className="text-bone">Compartilhe com quem você quer proteger.</strong>
         </p>
       </div>
     );
@@ -78,13 +79,17 @@ export function LeadForm() {
 
   return (
     <div className="flex w-full flex-col gap-4">
-      <div className="relative w-full rounded-xl border-l-2 border-gold-500 bg-ink-800/40 px-4 py-3 text-left text-sm leading-snug text-bone/85 sm:px-5 sm:text-base">
+      <div className="relative w-full space-y-2.5 rounded-xl border-l-2 border-gold-500 bg-ink-800/40 px-4 py-3.5 text-left text-sm leading-snug text-bone/85 sm:space-y-3 sm:px-5 sm:py-4 sm:text-base">
+        <p className="text-bone">
+          <strong>Você quer aprender a proteger sua família com o Sargento Nantes?</strong>
+        </p>
         <p>
-          <strong className="text-bone">
-            Você quer que o Sargento Nantes te ensine a proteger sua família?
-          </strong>{" "}
-          Assine o abaixo-assinado e exija que o Nantes abra o treinamento que pode salvar quem você ama.{" "}
-          <span className="text-gold-400">Quanto mais assinaturas, mais cedo ele libera.</span>
+          Nós também. Apoie este abaixo-assinado para o Sargento realizar um{" "}
+          <span className="text-bone">treinamento digital de segurança domiciliar</span>{" "}
+          que pode salvar quem você ama.
+        </p>
+        <p className="text-bone/80">
+          Te manteremos informado sobre o andamento desse projeto. <span className="whitespace-nowrap">Faça parte! 🇧🇷</span>
         </p>
       </div>
 
@@ -145,8 +150,8 @@ export function LeadForm() {
           <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
         </span>
         <span>
-          <strong className="text-bone">+1.247 brasileiros</strong> assinaram nas últimas 24h ·
-          <span className="text-gold-400"> não fique de fora</span>
+          <strong className="text-bone">+1.247 brasileiros</strong> apoiaram nas últimas 24h ·
+          <span className="text-gold-400"> faça parte</span>
         </span>
       </div>
     </div>
