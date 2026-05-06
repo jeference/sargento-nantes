@@ -49,8 +49,8 @@ export function Hero() {
       </div>
 
       <p className="mt-4 max-w-md text-balance text-sm leading-snug text-bone/85 sm:mt-5 sm:text-base">
-        No estado de <strong className="text-bone">São Paulo</strong>, uma residência é
-        invadida a cada <strong className="text-bone">10 minutos</strong>.
+        No estado de São Paulo, uma residência é
+        invadida a cada 10 minutos.
       </p>
       <p className="mt-1 text-[10px] uppercase tracking-[0.18em] text-muted sm:text-[11px]">
         Fonte: Secretaria de Segurança Pública
