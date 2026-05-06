@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Loader2, ShieldAlert } from "lucide-react";
 
 interface BrazilianState {
@@ -17,20 +17,198 @@ interface Municipality {
 interface LocationSelectProps {
   state: string;
   city: string;
-  onStateChange: (stateName: string) => void;
-  onCityChange: (city: string) => void;
+  onStateChange: (val: string) => void;
+  onCityChange: (val: string) => void;
   stateError?: string;
   cityError?: string;
 }
 
 const COMBINING_MARKS = /[̀-ͯ]/g;
 
-function stripAccents(s: string): string {
-  return s.normalize("NFD").replace(COMBINING_MARKS, "");
+function normalize(s: string): string {
+  return s.normalize("NFD").replace(COMBINING_MARKS, "").toLowerCase().trim();
 }
 
-function normalize(s: string): string {
-  return stripAccents(s).toLowerCase().trim();
+interface ComboboxProps {
+  value: string;
+  onChange: (val: string) => void;
+  options: string[];
+  placeholder: string;
+  ariaLabel: string;
+  disabled?: boolean;
+  loading?: boolean;
+  error?: string;
+}
+
+function Combobox({
+  value,
+  onChange,
+  options,
+  placeholder,
+  ariaLabel,
+  disabled,
+  loading,
+  error,
+}: ComboboxProps) {
+  const [query, setQuery] = useState(value);
+  const [open, setOpen] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const [highlight, setHighlight] = useState(0);
+  const [hasTyped, setHasTyped] = useState(false);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const listRef = useRef<HTMLUListElement>(null);
+
+  useEffect(() => {
+    if (!focused) setQuery(value);
+  }, [value, focused]);
+
+  const filtered = useMemo(() => {
+    if (!hasTyped) return options;
+    const norm = normalize(query);
+    if (!norm) return options;
+    return options.filter((o) => normalize(o).includes(norm));
+  }, [query, options, hasTyped]);
+
+  useEffect(() => {
+    setHighlight(0);
+  }, [filtered.length]);
+
+  useEffect(() => {
+    if (!open || !listRef.current) return;
+    const el = listRef.current.children[highlight] as HTMLElement | undefined;
+    el?.scrollIntoView({ block: "nearest" });
+  }, [highlight, open]);
+
+  useEffect(() => {
+    function onMouseDown(e: MouseEvent) {
+      if (!wrapperRef.current || wrapperRef.current.contains(e.target as Node)) return;
+      setOpen(false);
+      setHasTyped(false);
+      const exact = options.find((o) => normalize(o) === normalize(query));
+      if (exact) {
+        setQuery(exact);
+        onChange(exact);
+      } else if (!query.trim()) {
+        onChange("");
+      } else {
+        setQuery(value);
+      }
+    }
+    document.addEventListener("mousedown", onMouseDown);
+    return () => document.removeEventListener("mousedown", onMouseDown);
+  }, [query, options, value, onChange]);
+
+  function pick(opt: string) {
+    setQuery(opt);
+    onChange(opt);
+    setOpen(false);
+    setHasTyped(false);
+    setFocused(false);
+    inputRef.current?.blur();
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setOpen(true);
+      setHighlight((i) => Math.min(i + 1, filtered.length - 1));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setHighlight((i) => Math.max(i - 1, 0));
+    } else if (e.key === "Enter") {
+      if (open && filtered[highlight]) {
+        e.preventDefault();
+        pick(filtered[highlight]);
+      }
+    } else if (e.key === "Escape") {
+      e.preventDefault();
+      setOpen(false);
+      inputRef.current?.blur();
+    }
+  }
+
+  return (
+    <div ref={wrapperRef}>
+      <div className="relative">
+        <input
+          ref={inputRef}
+          type="text"
+          value={query}
+          onChange={(e) => {
+            const v = e.target.value;
+            setQuery(v);
+            setOpen(true);
+            setHasTyped(true);
+            const exact = options.find((o) => normalize(o) === normalize(v));
+            onChange(exact ?? "");
+          }}
+          onFocus={() => {
+            setFocused(true);
+            setOpen(true);
+          }}
+          onBlur={() => setFocused(false)}
+          onKeyDown={handleKeyDown}
+          placeholder={placeholder}
+          disabled={disabled}
+          autoComplete="off"
+          role="combobox"
+          aria-autocomplete="list"
+          aria-expanded={open}
+          aria-invalid={!!error}
+          aria-label={ariaLabel}
+          className="input-dark w-full rounded-lg px-4 py-3.5 text-base disabled:cursor-not-allowed disabled:opacity-60"
+        />
+
+        {loading && (
+          <Loader2
+            aria-hidden
+            className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-muted"
+          />
+        )}
+
+        {open && !disabled && filtered.length > 0 && (
+          <ul
+            ref={listRef}
+            role="listbox"
+            className="absolute left-0 right-0 top-full z-30 mt-1.5 max-h-60 overflow-y-auto overscroll-contain rounded-lg border border-ink-500/60 bg-ink-800 py-1 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.95)]"
+          >
+            {filtered.map((opt, i) => (
+              <li
+                key={opt}
+                role="option"
+                aria-selected={i === highlight}
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  pick(opt);
+                }}
+                onMouseEnter={() => setHighlight(i)}
+                className={`cursor-pointer px-4 py-2 text-sm transition-colors ${
+                  i === highlight
+                    ? "bg-gold-500/15 text-bone"
+                    : "text-bone/85 hover:bg-ink-700/60"
+                }`}
+              >
+                {opt}
+              </li>
+            ))}
+          </ul>
+        )}
+
+        {open && !disabled && hasTyped && query.trim() && filtered.length === 0 && (
+          <div className="absolute left-0 right-0 top-full z-30 mt-1.5 rounded-lg border border-ink-500/60 bg-ink-800 px-4 py-3 text-sm text-muted shadow-[0_20px_60px_-15px_rgba(0,0,0,0.95)]">
+            Nenhum resultado
+          </div>
+        )}
+      </div>
+
+      {error && (
+        <p className="mt-1.5 flex items-center gap-1.5 text-xs text-danger">
+          <ShieldAlert className="h-3.5 w-3.5" /> {error}
+        </p>
+      )}
+    </div>
+  );
 }
 
 export function LocationSelect({
@@ -54,11 +232,10 @@ export function LocationSelect({
   }, []);
 
   useEffect(() => {
-    if (!state) {
+    if (!state || states.length === 0) {
       setSelectedSigla("");
       return;
     }
-    if (states.length === 0) return;
     const found = states.find((s) => normalize(s.nome) === normalize(state));
     setSelectedSigla(found?.sigla ?? "");
   }, [state, states]);
@@ -78,102 +255,35 @@ export function LocationSelect({
       .finally(() => setLoadingMunicipalities(false));
   }, [selectedSigla]);
 
-  function handleStateInput(text: string) {
-    const norm = normalize(text);
-    const match = states.find((s) => normalize(s.nome) === norm);
-    if (match) {
-      onStateChange(match.nome);
-    } else {
-      onStateChange(text);
-    }
-  }
-
-  function handleCityInput(text: string) {
-    const norm = normalize(text);
-    const match = municipalities.find((m) => normalize(m.nome) === norm);
-    if (match) {
-      onCityChange(match.nome);
-    } else {
-      onCityChange(text);
-    }
-  }
+  const stateOptions = useMemo(() => states.map((s) => s.nome), [states]);
+  const cityOptions = useMemo(() => municipalities.map((m) => m.nome), [municipalities]);
 
   return (
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-      <div>
-        <input
-          type="text"
-          list="state-options"
-          value={state}
-          onChange={(e) => handleStateInput(e.target.value)}
-          placeholder="Seu estado"
-          aria-invalid={!!stateError}
-          aria-label="Estado"
-          autoComplete="off"
-          className="input-dark w-full rounded-lg px-4 py-3.5 text-base"
-        />
-        <datalist id="state-options">
-          {states.map((s) => {
-            const stripped = stripAccents(s.nome);
-            return (
-              <Fragment key={s.id}>
-                <option value={s.nome} />
-                {stripped !== s.nome && <option value={stripped} />}
-              </Fragment>
-            );
-          })}
-        </datalist>
-        {stateError && (
-          <p className="mt-1.5 flex items-center gap-1.5 text-xs text-danger">
-            <ShieldAlert className="h-3.5 w-3.5" /> {stateError}
-          </p>
-        )}
-      </div>
-
-      <div>
-        <div className="relative">
-          <input
-            type="text"
-            list="city-options"
-            value={city}
-            onChange={(e) => handleCityInput(e.target.value)}
-            disabled={!selectedSigla || loadingMunicipalities}
-            placeholder={
-              !selectedSigla
-                ? "Selecione o estado primeiro"
-                : loadingMunicipalities
-                ? "Carregando cidades…"
-                : "Sua cidade"
-            }
-            aria-invalid={!!cityError}
-            aria-label="Cidade"
-            autoComplete="off"
-            className="input-dark w-full rounded-lg px-4 py-3.5 text-base disabled:cursor-not-allowed disabled:opacity-60"
-          />
-          <datalist id="city-options">
-            {municipalities.map((m) => {
-              const stripped = stripAccents(m.nome);
-              return (
-                <Fragment key={m.id}>
-                  <option value={m.nome} />
-                  {stripped !== m.nome && <option value={stripped} />}
-                </Fragment>
-              );
-            })}
-          </datalist>
-          {loadingMunicipalities && (
-            <Loader2
-              aria-hidden
-              className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-muted"
-            />
-          )}
-        </div>
-        {cityError && (
-          <p className="mt-1.5 flex items-center gap-1.5 text-xs text-danger">
-            <ShieldAlert className="h-3.5 w-3.5" /> {cityError}
-          </p>
-        )}
-      </div>
+      <Combobox
+        value={state}
+        onChange={onStateChange}
+        options={stateOptions}
+        placeholder="Seu estado"
+        ariaLabel="Estado"
+        error={stateError}
+      />
+      <Combobox
+        value={city}
+        onChange={onCityChange}
+        options={cityOptions}
+        placeholder={
+          !selectedSigla
+            ? "Selecione o estado primeiro"
+            : loadingMunicipalities
+            ? "Carregando cidades…"
+            : "Sua cidade"
+        }
+        ariaLabel="Cidade"
+        disabled={!selectedSigla || loadingMunicipalities}
+        loading={loadingMunicipalities}
+        error={cityError}
+      />
     </div>
   );
 }
