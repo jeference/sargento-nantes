@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Loader2, ShieldAlert } from "lucide-react";
 
 interface BrazilianState {
@@ -17,10 +17,20 @@ interface Municipality {
 interface LocationSelectProps {
   state: string;
   city: string;
-  onStateChange: (uf: string) => void;
+  onStateChange: (stateName: string) => void;
   onCityChange: (city: string) => void;
   stateError?: string;
   cityError?: string;
+}
+
+const COMBINING_MARKS = /[̀-ͯ]/g;
+
+function stripAccents(s: string): string {
+  return s.normalize("NFD").replace(COMBINING_MARKS, "");
+}
+
+function normalize(s: string): string {
+  return stripAccents(s).toLowerCase().trim();
 }
 
 export function LocationSelect({
@@ -32,7 +42,7 @@ export function LocationSelect({
   cityError,
 }: LocationSelectProps) {
   const [states, setStates] = useState<BrazilianState[]>([]);
-  const [stateText, setStateText] = useState("");
+  const [selectedSigla, setSelectedSigla] = useState<string>("");
   const [municipalities, setMunicipalities] = useState<Municipality[]>([]);
   const [loadingMunicipalities, setLoadingMunicipalities] = useState(false);
 
@@ -45,37 +55,47 @@ export function LocationSelect({
 
   useEffect(() => {
     if (!state) {
+      setSelectedSigla("");
+      return;
+    }
+    if (states.length === 0) return;
+    const found = states.find((s) => normalize(s.nome) === normalize(state));
+    setSelectedSigla(found?.sigla ?? "");
+  }, [state, states]);
+
+  useEffect(() => {
+    if (!selectedSigla) {
       setMunicipalities([]);
       return;
     }
     setLoadingMunicipalities(true);
     fetch(
-      `https://servicodados.ibge.gov.br/api/v1/localidades/estados/${state}/municipios?orderBy=nome`
+      `https://servicodados.ibge.gov.br/api/v1/localidades/estados/${selectedSigla}/municipios?orderBy=nome`
     )
       .then((r) => (r.ok ? r.json() : []))
       .then((data: Municipality[]) => setMunicipalities(data))
       .catch(() => setMunicipalities([]))
       .finally(() => setLoadingMunicipalities(false));
-  }, [state]);
-
-  useEffect(() => {
-    if (!state) setStateText("");
-  }, [state]);
+  }, [selectedSigla]);
 
   function handleStateInput(text: string) {
-    const dropdownPick = states.find((s) => `${s.sigla} - ${s.nome}` === text);
-    if (dropdownPick) {
-      setStateText(dropdownPick.nome);
-      onStateChange(dropdownPick.sigla);
-      return;
+    const norm = normalize(text);
+    const match = states.find((s) => normalize(s.nome) === norm);
+    if (match) {
+      onStateChange(match.nome);
+    } else {
+      onStateChange(text);
     }
+  }
 
-    setStateText(text);
-    const trimmed = text.trim().toLowerCase();
-    const match = states.find(
-      (s) => s.sigla.toLowerCase() === trimmed || s.nome.toLowerCase() === trimmed
-    );
-    onStateChange(match ? match.sigla : "");
+  function handleCityInput(text: string) {
+    const norm = normalize(text);
+    const match = municipalities.find((m) => normalize(m.nome) === norm);
+    if (match) {
+      onCityChange(match.nome);
+    } else {
+      onCityChange(text);
+    }
   }
 
   return (
@@ -84,7 +104,7 @@ export function LocationSelect({
         <input
           type="text"
           list="state-options"
-          value={stateText}
+          value={state}
           onChange={(e) => handleStateInput(e.target.value)}
           placeholder="Seu estado"
           aria-invalid={!!stateError}
@@ -93,9 +113,15 @@ export function LocationSelect({
           className="input-dark w-full rounded-lg px-4 py-3.5 text-base"
         />
         <datalist id="state-options">
-          {states.map((s) => (
-            <option key={s.id} value={`${s.sigla} - ${s.nome}`} />
-          ))}
+          {states.map((s) => {
+            const stripped = stripAccents(s.nome);
+            return (
+              <Fragment key={s.id}>
+                <option value={s.nome} />
+                {stripped !== s.nome && <option value={stripped} />}
+              </Fragment>
+            );
+          })}
         </datalist>
         {stateError && (
           <p className="mt-1.5 flex items-center gap-1.5 text-xs text-danger">
@@ -110,10 +136,10 @@ export function LocationSelect({
             type="text"
             list="city-options"
             value={city}
-            onChange={(e) => onCityChange(e.target.value)}
-            disabled={!state || loadingMunicipalities}
+            onChange={(e) => handleCityInput(e.target.value)}
+            disabled={!selectedSigla || loadingMunicipalities}
             placeholder={
-              !state
+              !selectedSigla
                 ? "Selecione o estado primeiro"
                 : loadingMunicipalities
                 ? "Carregando cidades…"
@@ -125,9 +151,15 @@ export function LocationSelect({
             className="input-dark w-full rounded-lg px-4 py-3.5 text-base disabled:cursor-not-allowed disabled:opacity-60"
           />
           <datalist id="city-options">
-            {municipalities.map((m) => (
-              <option key={m.id} value={m.nome} />
-            ))}
+            {municipalities.map((m) => {
+              const stripped = stripAccents(m.nome);
+              return (
+                <Fragment key={m.id}>
+                  <option value={m.nome} />
+                  {stripped !== m.nome && <option value={stripped} />}
+                </Fragment>
+              );
+            })}
           </datalist>
           {loadingMunicipalities && (
             <Loader2

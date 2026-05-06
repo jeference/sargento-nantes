@@ -14,7 +14,8 @@ export const leadSchema = z.object({
   state: z
     .string()
     .trim()
-    .length(2, "Selecione seu estado"),
+    .min(2, "Selecione seu estado")
+    .max(60, "Estado inválido"),
   city: z
     .string()
     .trim()
