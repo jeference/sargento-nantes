@@ -52,16 +52,27 @@ function Combobox({
 }: ComboboxProps) {
   const [query, setQuery] = useState(value);
   const [open, setOpen] = useState(false);
-  const [focused, setFocused] = useState(false);
   const [highlight, setHighlight] = useState(0);
   const [hasTyped, setHasTyped] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
+  const lastEmittedRef = useRef<string>(value);
+  const justPickedRef = useRef(false);
 
+  // Sync query only when value changes EXTERNALLY (parent reset, etc).
   useEffect(() => {
-    if (!focused) setQuery(value);
-  }, [value, focused]);
+    if (value !== lastEmittedRef.current) {
+      lastEmittedRef.current = value;
+      setQuery(value);
+    }
+  }, [value]);
+
+  function emit(val: string) {
+    if (val === lastEmittedRef.current) return;
+    lastEmittedRef.current = val;
+    onChange(val);
+  }
 
   const filtered = useMemo(() => {
     if (!hasTyped) return options;
@@ -80,32 +91,35 @@ function Combobox({
     el?.scrollIntoView({ block: "nearest" });
   }, [highlight, open]);
 
-  useEffect(() => {
-    function onMouseDown(e: MouseEvent) {
-      if (!wrapperRef.current || wrapperRef.current.contains(e.target as Node)) return;
-      setOpen(false);
-      setHasTyped(false);
-      const exact = options.find((o) => normalize(o) === normalize(query));
-      if (exact) {
-        setQuery(exact);
-        onChange(exact);
-      } else if (!query.trim()) {
-        onChange("");
-      } else {
-        setQuery(value);
-      }
-    }
-    document.addEventListener("mousedown", onMouseDown);
-    return () => document.removeEventListener("mousedown", onMouseDown);
-  }, [query, options, value, onChange]);
-
   function pick(opt: string) {
+    justPickedRef.current = true;
     setQuery(opt);
-    onChange(opt);
+    emit(opt);
     setOpen(false);
     setHasTyped(false);
-    setFocused(false);
-    inputRef.current?.blur();
+  }
+
+  function handleInputChange(text: string) {
+    setQuery(text);
+    setOpen(true);
+    setHasTyped(true);
+    const match = options.find((o) => normalize(o) === normalize(text));
+    emit(match ?? "");
+  }
+
+  function handleBlur() {
+    setOpen(false);
+    setHasTyped(false);
+    if (justPickedRef.current) {
+      // Pick acabou de rodar — não tenta restaurar nada (closure ainda tem query/value antigos)
+      justPickedRef.current = false;
+      return;
+    }
+    const match = options.find((o) => normalize(o) === normalize(query));
+    if (!match) {
+      // Input não casa com nada válido — restaura para o último valor confirmado
+      setQuery(value);
+    }
   }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
@@ -120,6 +134,7 @@ function Combobox({
       if (open && filtered[highlight]) {
         e.preventDefault();
         pick(filtered[highlight]);
+        inputRef.current?.blur();
       }
     } else if (e.key === "Escape") {
       e.preventDefault();
@@ -128,6 +143,16 @@ function Combobox({
     }
   }
 
+  // Fecha o dropdown ao clicar fora — sem mexer em valor algum.
+  useEffect(() => {
+    function onMouseDown(e: MouseEvent) {
+      if (!wrapperRef.current || wrapperRef.current.contains(e.target as Node)) return;
+      setOpen(false);
+    }
+    document.addEventListener("mousedown", onMouseDown);
+    return () => document.removeEventListener("mousedown", onMouseDown);
+  }, []);
+
   return (
     <div ref={wrapperRef}>
       <div className="relative">
@@ -135,19 +160,9 @@ function Combobox({
           ref={inputRef}
           type="text"
           value={query}
-          onChange={(e) => {
-            const v = e.target.value;
-            setQuery(v);
-            setOpen(true);
-            setHasTyped(true);
-            const exact = options.find((o) => normalize(o) === normalize(v));
-            onChange(exact ?? "");
-          }}
-          onFocus={() => {
-            setFocused(true);
-            setOpen(true);
-          }}
-          onBlur={() => setFocused(false)}
+          onChange={(e) => handleInputChange(e.target.value)}
+          onFocus={() => setOpen(true)}
+          onBlur={handleBlur}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           disabled={disabled}
@@ -181,6 +196,7 @@ function Combobox({
                 onMouseDown={(e) => {
                   e.preventDefault();
                   pick(opt);
+                  inputRef.current?.blur();
                 }}
                 onMouseEnter={() => setHighlight(i)}
                 className={`cursor-pointer px-4 py-2 text-sm transition-colors ${

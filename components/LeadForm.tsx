@@ -2,7 +2,7 @@
 
 import { startTransition, useActionState, useEffect, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, useController } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CheckCircle2, Loader2, PenLine, ShieldAlert } from "lucide-react";
 import { submitLead, type SubmitLeadState } from "@/app/actions";
@@ -41,8 +41,6 @@ export function LeadForm() {
   const {
     register,
     control,
-    setValue,
-    watch,
     clearErrors,
     handleSubmit,
     formState: { errors },
@@ -53,10 +51,8 @@ export function LeadForm() {
     defaultValues: { name: "", phone: "", state: "", city: "" },
   });
 
-  register("state");
-  register("city");
-  const stateValue = watch("state");
-  const cityValue = watch("city");
+  const { field: stateField } = useController({ name: "state", control });
+  const { field: cityField } = useController({ name: "city", control });
 
   useEffect(() => {
     if (state.ok) formRef.current?.reset();
@@ -132,15 +128,15 @@ export function LeadForm() {
       </div>
 
       <LocationSelect
-        state={stateValue}
-        city={cityValue}
+        state={stateField.value}
+        city={cityField.value}
         onStateChange={(v) => {
-          setValue("state", v, { shouldValidate: false });
-          setValue("city", "", { shouldValidate: false });
+          stateField.onChange(v);
+          cityField.onChange("");
           clearErrors(["state", "city"]);
         }}
         onCityChange={(v) => {
-          setValue("city", v, { shouldValidate: false });
+          cityField.onChange(v);
           clearErrors("city");
         }}
         stateError={errors.state?.message}
